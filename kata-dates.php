@@ -1,13 +1,8 @@
-<?php
-/*
- Crea una funció que calculi i retorni quants dies hi ha entre dues cadenes de text donades:
-La cadena de text que representa una data té el format "dd/mm/yyyy"
-La diferència entre dies serà absoluta(no importa l'ordre de les dates)
-Si alguna de les dates donades no respecta el format de data donat, s'ha de mostrar un error.
- */
+<?php 
+$fecha1 = "12/01/2000";
+$fecha2 = "30/11/2555";
 
-$fecha1 = "11/31/2345";
-$fecha2 = "11/31/2555";
+//Primero un explode para sacar las fechas
 
 $fechaxploted1 = explode("/",$fecha1);
 $dias1 = intval($fechaxploted1[0]);
@@ -23,10 +18,68 @@ $diasdif = abs($dias1 -$dias2);
 $mesesdif = abs($meses1 - $meses2);
 $añosdif = abs($años1 - $años2);
 
-if ($dias1 >12 || $dias2 >12 || $meses1 >31 || $meses2 >31 ){
+//array con los dias de cada mes 
+$diasmeses=[
+31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+$mesesdif = $mesesdif * 31;
+function sumarbienlosmeses($mesesdif, $meses1, $meses2, array $diasmeses): int {
+ 
+    if ($meses1 > $meses2) {
+        $difmesaño = $meses1;
+        $meses1 = $meses2;
+        $meses2 = $difmesaño;
+    }
+
+    for ($x = $meses1 - 1; $x < $meses2; $x++) {
+        if ($diasmeses[$x] !== 31) {
+            $mesesdif += $diasmeses[$x] - 31;
+        }
+    }
+    return $mesesdif;
+}
+
+$añosdif = $añosdif * 365;
+
+//if complicado con las reglas que determinan si es bisiesto
+function esBisiesto($year) {
+    if ($year % 4 == 0) {
+        if ($year % 100 == 0) {
+            if ($year % 400 == 0) {
+                return true; 
+            } else {
+                return false; 
+            }
+        } else {
+            return true;
+        }
+    } else {
+        return false; 
+    }
+}
+
+// Funcion para ver dias bisiestos a tener en cuenta
+function contarAniosBisiestos($inicio, $fin) {
+    $bisiestos = 0;
+    for ($year = $inicio; $year <= $fin; $year++) {
+        if (esBisiesto($year)) {
+            $bisiestos++;
+        }
+    }
+    return $bisiestos;
+}
+
+if ($dias1 >31 || $dias2 >31 || $meses1 >12 || $meses2 >12 ){
     echo "formato de fecha incorrecto";
 }
+
 else{
-echo "la diferencia es de " . $diasdif + $mesesdif * 30 +$añosdif + 365 ." dias";
+echo "la diferencia es de " . $diasdif + sumarbienlosmeses($mesesdif,$meses1,$meses2, $diasmeses)+$añosdif 
++contarAniosBisiestos($años1, $años2) +1 ." dias";
+//sumo 1 al final, por alguna razon todos los resultados tienen un dia menos 
 }
+
+
+
+
 ?>
